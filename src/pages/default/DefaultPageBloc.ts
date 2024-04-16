@@ -13,6 +13,7 @@ export class DefaultPageState {
     optionalFields: false,
     rootObjectName: "RootObject",
     addPrefix: false,
+    brainCustom: true,
   };
 
   copyWith(params: {
@@ -67,6 +68,11 @@ export class DefaultPageBloc {
 
   handleAddPrefixChange(e: boolean) {
     this.state.value.options.addPrefix = e;
+    this.state.value = this.state.value.copyWith({});
+  }
+
+  handleBrainCustomChange(e: boolean) {
+    this.state.value.options.brainCustom = e;
     this.state.value = this.state.value.copyWith({});
   }
 }
