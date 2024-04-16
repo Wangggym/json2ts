@@ -1,3 +1,7 @@
+import { BrainStatementImpl } from "../port/StatementCustom/BrainStatementImpl";
+import { DefaultStatementImpl } from "../port/StatementCustom/DefaultStatementImpl";
+import { StatementCustom } from "../port/StatementCustom/StatementCustom";
+
 type Partial<T> = {
   [P in keyof T]?: T[P];
 };
@@ -7,12 +11,14 @@ interface IJson2TsConfigPrivate {
   optionalFields: boolean;
   rootObjectName: string;
   addPrefix: boolean;
+  brainCustom: boolean;
 }
 
 export type IJson2TsConfig = Partial<IJson2TsConfigPrivate>;
 
 export class Json2Ts {
   private config: IJson2TsConfigPrivate;
+  private statementCustom: StatementCustom;
 
   private interfaces: {
     [name: string]: {
@@ -26,8 +32,10 @@ export class Json2Ts {
       optionalFields: false,
       rootObjectName: "RootObject",
       addPrefix: false,
+      brainCustom: true,
       ...config,
     };
+    this.statementCustom = config.brainCustom ? new BrainStatementImpl() : new DefaultStatementImpl();
   }
 
   convert(json: {}) {
@@ -136,12 +144,13 @@ export class Json2Ts {
         }
         fields.forEach(field => {
           const type = this.interfaces[name][field];
-          const defaultValue = optionalFields ? "" : " = " + this.getDefaultValue(type);
+          const defaultTypeValue = this.getDefaultValue(type);
+          const defaultValue = optionalFields ? "" : " = " + defaultTypeValue;
 
           const customType = type.replace("[]", "");
           const customTypeCheck = Object.keys(this.interfaces).includes(customType);
           if (customTypeCheck) {
-            interfaceStr.push(`  @Type(() => ${customType})`);
+            interfaceStr.push(this.statementCustom.typeStatementGenerator(customType, defaultTypeValue));
           }
           const rewriteFiled = this.hasSpaceInMiddle(field) ? `"${field}"` : field;
           interfaceStr.push(`  ${rewriteFiled}${optionalFields ? "?" : ""}: ${type}${defaultValue};`);
@@ -151,7 +160,7 @@ export class Json2Ts {
       })
       .join("\n");
 
-    if (outout.includes("@Type")) outout = 'import { Type } from "class-transformer";\n\n' + outout;
+    if (outout.includes("@Type")) outout = this.statementCustom.importTypeStatement + "\n\n" + outout;
     return outout;
   }
 

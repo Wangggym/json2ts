@@ -52,6 +52,9 @@ export function DefaultPage(props: {}): React.JSX.Element {
                 <Form.Item label="添加前缀">
                   <Switch value={bloc.state.value.options.addPrefix} onChange={e => bloc.handleAddPrefixChange(e)} />
                 </Form.Item>
+                <Form.Item label="Brain 自定义">
+                  <Switch value={bloc.state.value.options.brainCustom} onChange={e => bloc.handleBrainCustomChange(e)} />
+                </Form.Item>
                 <Form.Item label="类名">
                   <Input
                     placeholder=""
@@ -59,6 +62,7 @@ export function DefaultPage(props: {}): React.JSX.Element {
                     onChange={e => bloc.handleRootObjectNameChange(e)}
                   />
                 </Form.Item>
+
                 <Form.Item label="&nbsp;" noStyle={false}>
                   <Button type="primary" onClick={() => bloc.transform()}>
                     生成

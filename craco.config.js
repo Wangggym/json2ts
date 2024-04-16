@@ -7,6 +7,7 @@ module.exports = {
       "@pages": path.resolve(__dirname, "src/pages"),
       "@router": path.resolve(__dirname, "src/router"),
       "@views": path.resolve(__dirname, "src/views"),
+      "@port": path.resolve(__dirname, "src/port"),
     },
     configure: {
       module: {
